@@ -1,4 +1,4 @@
-var frequencySlider, zoomSlider, axisCheckbox, selectFunction;
+var frequencySlider, zoomSlider, alphaSlider, axisCheckbox, selectFunction;
 // var f;
 var needsRedraw = true;
 
@@ -16,9 +16,13 @@ function setup() {
   zoomSlider.position(20, 100);
   // zoomSlider.changed(requestRedraw);
 
+  alphaSlider = createSlider(0.1, 255, 1, 1);
+  alphaSlider.position(20, 140);
+
+
   axisCheckbox = createCheckbox("Show Axis", true);
   // axisCheckbox.changed(requestRedraw);
-  axisCheckbox.position(20, 140);
+  axisCheckbox.position(20, 180);
 
   sel = createSelect();
   sel.position(20, 20);
@@ -67,6 +71,7 @@ function fPrime(x) {
 
 function draw() {
   setF();
+  push();
   var pixelsPerUnit = 100.0 * zoomSlider.value();
   var xStepSize = 0.005;
   var xMin = -width / pixelsPerUnit / 2;
@@ -97,7 +102,7 @@ function draw() {
   endShape();
 
   //graph tangents
-  stroke(0, 10);
+  stroke(0, alphaSlider.value());
   for (var x = xMin - xStepSize; x < xMax + 2 * xStepSize; x += xStepSize) {
     line(xMin, fPrime(x) * (xMin - x) + f(x), xMax, fPrime(x) * (xMax - x) + f(x));
   }
@@ -106,6 +111,8 @@ function draw() {
   //UI labels
   text("Frequency", 20, 60);
   text("Zoom", 20, 100);
+  text("Tangent Line Opacity", 20, 140);
+
 
 
 }
