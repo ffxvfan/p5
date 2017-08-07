@@ -1,27 +1,57 @@
-var iteration;
-var iterationSlider, zoomSlider, axisCheckbox;
+var frequencySlider, zoomSlider, axisCheckbox, selectFunction;
+var f;
+
+
 
 function setup() {
   createCanvas(1000, 800);
   //slider descriptions & position
-  iterationSlider = createSlider(0.1, 20, 1, 0.1);
-  iterationSlider.position(20, 20);
+  frequencySlider = createSlider(0.1, 20, 1, 0.1);
+  frequencySlider.position(20, 60);
+  frequencySlider.changed(functionChangedEvent);
+
 
   zoomSlider = createSlider(0.2, 5, 1, 0.1);
-  zoomSlider.position(20, 60);
+  zoomSlider.position(20, 100);
 
   axisCheckbox = createCheckbox("Show Axis", true);
   // axisCheckbox.changed(myCheckedEvent);
-  axisCheckbox.position(20, 100);
+  axisCheckbox.position(20, 140);
+
+  sel = createSelect();
+  sel.position(20, 20);
+  sel.option('cosine');
+  sel.option('secant');
+  sel.option('tangent');
+  sel.changed(functionChangedEvent);
+  functionChangedEvent();
+
 }
 
-function f(x) {
-  return x*x*x-x;
+function functionChangedEvent() {
+  var frequency = frequencySlider.value();
+  var item = sel.value();
+  if (item === 'cosine') {
+    f = function a(x) {
+      return cos(frequency*x);
+    };
+  } else if (item === 'secant') {
+    f = function a(x) {
+      return 1 / cos(frequency*x);
+    };
+  } else if (item === 'tangent') {
+    f = function a(x) {
+      return tan(frequency*x);
+    };
+  }
+  // return x*x*x-x;
+  // return 1/cos(x);
+  // return exp(x);
 }
 
 function fPrime(x) {
   var h = 0.0001;
-  return (f(x+h)-f(x))/h;
+  return (f(x + h) - f(x)) / h;
 }
 
 function draw() {
@@ -38,8 +68,6 @@ function draw() {
   scale(pixelsPerUnit, -pixelsPerUnit);
 
   strokeWeight(1.0 / pixelsPerUnit);
-
-  iteration = iterationSlider.value();
 
   //draw axis
   if (axisCheckbox.checked()) {
@@ -65,8 +93,8 @@ function draw() {
   pop();
 
   //UI labels
-  text("Frequency", 20, 20);
-  text("Zoom", 20, 60);
+  text("Frequency", 20, 60);
+  text("Zoom", 20, 100);
 
 
 }
