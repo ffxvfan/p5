@@ -1,5 +1,6 @@
 var frequencySlider, zoomSlider, axisCheckbox, selectFunction;
-var f;
+// var f;
+var needsRedraw = true;
 
 
 
@@ -8,14 +9,15 @@ function setup() {
   //slider descriptions & position
   frequencySlider = createSlider(0.1, 20, 1, 0.1);
   frequencySlider.position(20, 60);
-  frequencySlider.changed(functionChangedEvent);
+  // frequencySlider.changed(requestRedraw);
 
 
   zoomSlider = createSlider(0.2, 5, 1, 0.1);
   zoomSlider.position(20, 100);
+  // zoomSlider.changed(requestRedraw);
 
   axisCheckbox = createCheckbox("Show Axis", true);
-  // axisCheckbox.changed(myCheckedEvent);
+  // axisCheckbox.changed(requestRedraw);
   axisCheckbox.position(20, 140);
 
   sel = createSelect();
@@ -24,12 +26,16 @@ function setup() {
   sel.option('secant');
   sel.option('tangent');
   sel.option('harmonic');
-  sel.changed(functionChangedEvent);
-  functionChangedEvent();
+  // sel.changed(requestRedraw);
+  setF();
 
 }
+function requestRedraw()  {
+  needsRedraw = true;
+}
 
-function functionChangedEvent() {
+
+function setF() {
   var frequency = frequencySlider.value();
   var item = sel.value();
   if (item === 'cosine') {
@@ -60,7 +66,7 @@ function fPrime(x) {
 }
 
 function draw() {
-  push();
+  setF();
   var pixelsPerUnit = 100.0 * zoomSlider.value();
   var xStepSize = 0.005;
   var xMin = -width / pixelsPerUnit / 2;
