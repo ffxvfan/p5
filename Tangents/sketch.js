@@ -23,6 +23,7 @@ function setup() {
   sel.option('cosine');
   sel.option('secant');
   sel.option('tangent');
+  sel.option('harmonic');
   sel.changed(functionChangedEvent);
   functionChangedEvent();
 
@@ -42,6 +43,10 @@ function functionChangedEvent() {
   } else if (item === 'tangent') {
     f = function a(x) {
       return tan(frequency*x);
+    };
+  } else if (item === 'harmonic') {
+    f = function a(x) {
+      return sin(frequency*x)/x;
     };
   }
   // return x*x*x-x;
