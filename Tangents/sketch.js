@@ -1,5 +1,6 @@
-var frequencySlider, zoomSlider, alphaSlider, axisCheckbox, selectFunction;
-// var f;
+var frequencySlider, zoomSlider, alphaSlider, axisCheckbox, selectFunction, ampSlider, tangentLineDensity, functionCheckBox;
+var sliderCount = 0,
+  sliderLabels = [];
 var needsRedraw = true;
 
 
@@ -7,22 +8,23 @@ var needsRedraw = true;
 function setup() {
   createCanvas(1000, 800);
   //slider descriptions & position
-  frequencySlider = createSlider(0.1, 20, 1, 0.1);
-  frequencySlider.position(20, 60);
-  // frequencySlider.changed(requestRedraw);
+  frequencySlider = makeSlider(0.1, 20, 1, 0.1, "Frequency");
 
+  zoomSlider = makeSlider(0.2, 5, 1, 0.1, "Zoom");
 
-  zoomSlider = createSlider(0.2, 5, 1, 0.1);
-  zoomSlider.position(20, 100);
-  // zoomSlider.changed(requestRedraw);
+  alphaSlider = makeSlider(0.1, 255, 1, 1, "Tangent Line Opacity");
 
-  alphaSlider = createSlider(0.1, 255, 1, 1);
-  alphaSlider.position(20, 140);
+  ampSlider = makeSlider(0.1, 20, 1, 0.01, "Amplitude");
 
+  tangentLineDensity = makeSlider(0.001, 1, 0.005, 0.0001, "Tangent Line Density");
 
   axisCheckbox = createCheckbox("Show Axis", true);
-  // axisCheckbox.changed(requestRedraw);
-  axisCheckbox.position(20, 180);
+  axisCheckbox.position(20, 260);
+
+  functionCheckBox = createCheckbox("Show Function", true);
+  functionCheckBox.position(20, 300);
+
+
 
   sel = createSelect();
   sel.position(20, 20);
@@ -34,29 +36,38 @@ function setup() {
   setF();
 
 }
-function requestRedraw()  {
+
+function makeSlider(min, max, start, increment, label) {
+  var slider = createSlider(min, max, start, increment);
+  slider.position(20, 60 + (40 * sliderCount++));
+  sliderLabels.push(label);
+  return slider;
+}
+
+function requestRedraw() {
   needsRedraw = true;
 }
 
 
 function setF() {
   var frequency = frequencySlider.value();
+  var amp = ampSlider.value();
   var item = sel.value();
   if (item === 'cosine') {
     f = function a(x) {
-      return cos(frequency*x);
+      return amp * cos(frequency * x);
     };
   } else if (item === 'secant') {
     f = function a(x) {
-      return 1 / cos(frequency*x);
+      return 1 / (amp * cos(frequency * x));
     };
   } else if (item === 'tangent') {
     f = function a(x) {
-      return tan(frequency*x);
+      return amp * tan(frequency * x);
     };
   } else if (item === 'harmonic') {
     f = function a(x) {
-      return sin(frequency*x)/x;
+      return (amp * sin(frequency * x)) / x;
     };
   }
   // return x*x*x-x;
@@ -73,7 +84,7 @@ function draw() {
   setF();
   push();
   var pixelsPerUnit = 100.0 * zoomSlider.value();
-  var xStepSize = 0.005;
+  var xStepSize = tangentLineDensity.value();
   var xMin = -width / pixelsPerUnit / 2;
   var xMax = width / pixelsPerUnit / 2;
   var yMin = -height / pixelsPerUnit / 2;
@@ -93,13 +104,16 @@ function draw() {
   }
 
   //graph parabola
-  stroke(0);
-  noFill();
-  beginShape();
-  for (var x = xMin - xStepSize; x < xMax + 2 * xStepSize; x += xStepSize) {
-    curveVertex(x, f(x));
+  if (functionCheckBox.checked()) {
+    stroke(0);
+    noFill();
+    smooth();
+    beginShape();
+    for (var x = xMin - xStepSize; x < xMax + 2 * xStepSize; x += xStepSize) {
+      curveVertex(x, f(x));
+    }
+    endShape();
   }
-  endShape();
 
   //graph tangents
   stroke(0, alphaSlider.value());
@@ -109,9 +123,14 @@ function draw() {
   pop();
 
   //UI labels
-  text("Frequency", 20, 60);
-  text("Zoom", 20, 100);
-  text("Tangent Line Opacity", 20, 140);
+  for (var c = 0; c < sliderLabels.length; c++) {
+    text(sliderLabels[c], 20, 60 + (40 * c));
+  }
+  // text("Frequency", 20, 60);
+  // text("Zoom", 20, 100);
+  // text("Tangent Line Opacity", 20, 140);
+  // text("Amplitude", 20, 220);
+  // text("Tangent Line Density", 20, 260);
 
 
 
